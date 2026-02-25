@@ -59,6 +59,20 @@ test('findByUserId returns null when user has no vault for a network', async () 
   assert.equal(result, null);
 });
 
+test('findByUserId returns null when index is stale', async () => {
+  const repository = new InMemoryVaultRepository();
+  const vault = await repository.create('user-1', 'contract-1', 'testnet');
+
+  // Simulates storage inconsistency and validates defensive null fallback.
+  (repository as unknown as { vaultsById: Map<string, unknown> }).vaultsById.delete(
+    vault.id
+  );
+
+  const result = await repository.findByUserId('user-1', 'testnet');
+
+  assert.equal(result, null);
+});
+
 test('updateBalanceSnapshot updates balance and last synced timestamp', async () => {
   const repository = new InMemoryVaultRepository();
   const vault = await repository.create('user-1', 'contract-1', 'testnet');
