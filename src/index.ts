@@ -7,6 +7,8 @@ const PORT = process.env.PORT ?? 3000;
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
 import express from 'express';
+import webhookRouter from './webhooks/webhook.routes';
+import { calloraEvents } from './events/event.emitter';
 import helmet from 'helmet';
 import { db, initializeDb, schema } from './db/index.js';
 import { eq, desc } from 'drizzle-orm';
@@ -183,6 +185,25 @@ app.get('/api/usage', (_req, res) => {
   res.json({ calls: 0, period: 'current' });
 });
 
+// Webhook registration and management routes
+app.use('/api/webhooks', webhookRouter);
+
+if (process.env.NODE_ENV !== 'production') {
+  app.post('/api/test/trigger-event', (req, res) => {
+    const { developerId, event, data } = req.body;
+
+    if (!developerId || !event) {
+      return res.status(400).json({ error: 'developerId and event are required.' });
+    }
+
+    calloraEvents.emit(event, developerId, data ?? {});
+    return res.json({ triggered: event, developerId });
+  });
+}
+
+app.listen(PORT, () => {
+  console.log(`Callora backend listening on http://localhost:${PORT}`);
+});
 // Initialize database and start server
 async function startServer() {
   try {
