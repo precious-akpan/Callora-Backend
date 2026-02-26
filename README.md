@@ -12,10 +12,15 @@ API gateway, usage metering, and billing services for the Callora API marketplac
 
 - Health check: `GET /api/health`
 - Placeholder routes: `GET /api/apis`, `GET /api/usage`
-- Developer analytics route: `GET /api/developers/analytics`
+- JSON body parsing; ready to add auth, metering, and contract calls
+- In-memory `VaultRepository` with:
+  - `create(userId, contractId, network)`
+  - `findByUserId(userId, network)`
+  - `updateBalanceSnapshot(id, balance, lastSyncedAt)`
 
-## Developer analytics route
+## Vault repository behavior
 
+<<<<<<< HEAD
 Endpoint:
 
 `GET /api/developers/analytics`
@@ -31,16 +36,23 @@ Query params:
 - `groupBy` (optional): `day | week | month` (default: `day`)
 - `apiId` (optional): filters to one API (must belong to authenticated developer)
 - `includeTop` (optional): set to `true` to include `topEndpoints` and anonymized `topUsers`
+=======
+- Enforces one vault per user per network.
+- `balanceSnapshot` is stored in smallest units using non-negative integer `bigint` values.
+- `findByUserId` is network-aware and returns the vault for a specific user/network pair.
+>>>>>>> main
 
 ## Local setup
 
-1. Prerequisites: Node.js 18+
-2. Install and run:
+1. **Prerequisites:** Node.js 18+
+2. **Install and run (dev):**
 
    ```bash
+   cd callora-backend
    npm install
    npm run dev
    ```
+<<<<<<< HEAD
    
 3. API base: `http://localhost:3000`
 ### Docker Setup
@@ -51,6 +63,10 @@ You can run the entire stack (API and PostgreSQL) locally using Docker Compose:
 docker compose up --build
 ```
 The API will be available at http://localhost:3000, and the PostgreSQL database will be mapped to local port 5432.
+=======
+
+3. API base: [http://localhost:3000](http://localhost:3000). Example: [http://localhost:3000/api/health](http://localhost:3000/api/health).
+>>>>>>> main
 
 ## Scripts
 
@@ -59,33 +75,8 @@ The API will be available at http://localhost:3000, and the PostgreSQL database 
 | `npm run dev` | Run with tsx watch (no build) |
 | `npm run build` | Compile TypeScript to `dist/` |
 | `npm start` | Run compiled `dist/index.js` |
-| `npm test` | Run unit/integration tests |
-
-## Database migrations
-
-This repository includes SQL migrations for `api_keys` and `vaults` in `migrations/`.
-
-- `api_keys` stores only `key_hash` (never the raw API key).
-- `api_keys` enforces unique `(user_id, api_id)` and has an index on `(user_id, prefix)` for key lookup.
-- `vaults` stores per-user per-network snapshots with unique `(user_id, network)`.
-
-Run migrations with PostgreSQL:
-
-```bash
-psql "$DATABASE_URL" -f migrations/0001_create_api_keys_and_vaults.up.sql
-```
-
-Rollback:
-
-```bash
-psql "$DATABASE_URL" -f migrations/0001_create_api_keys_and_vaults.down.sql
-```
-
-Validate issue #9 requirements locally:
-
-```bash
-npm run validate:issue-9
-```
+| `npm test` | Run unit tests |
+| `npm run test:coverage` | Run unit tests with coverage |
 
 ### Observability (Prometheus Metrics)
 
@@ -101,23 +92,22 @@ Authorization: Bearer <YOUR_METRICS_API_KEY>
 ```text
 callora-backend/
 |-- src/
-|   |-- app.ts
-|   |-- app.test.ts
-|   |-- index.ts
-|   |-- middleware/
-|   |   |-- requireAuth.ts
+|   |-- index.ts                          # Express app and routes
 |   |-- repositories/
-|   |   |-- usageEventsRepository.ts
-|   |-- services/
-|   |   |-- developerAnalytics.ts
-|   |-- types/
-|       |-- auth.ts
+|       |-- vaultRepository.ts            # Vault repository implementation
+|       |-- vaultRepository.test.ts       # Unit tests
 |-- package.json
 |-- tsconfig.json
 ```
 
 ## Environment
 
+<<<<<<< HEAD
 - `PORT` — HTTP port (default: 3000). Optional for local dev.
 
 This repo is part of [Callora](https://github.com/your-org/callora). Frontend: `callora-frontend`. Contracts: `callora-contracts`.
+=======
+- `PORT` - HTTP port (default: 3000). Optional for local dev.
+
+This repo is part of [Callora](https://github.com/your-org/callora). Frontend: `callora-frontend`. Contracts: `callora-contracts`.
+>>>>>>> main
