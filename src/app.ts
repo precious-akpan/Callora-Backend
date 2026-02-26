@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 import {
   InMemoryUsageEventsRepository,
@@ -9,6 +10,7 @@ import type { ApiRepository } from './repositories/apiRepository.js';
 import { requireAuth, type AuthenticatedLocals } from './middleware/requireAuth.js';
 import { buildDeveloperAnalytics } from './services/developerAnalytics.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { requestLogger } from './middleware/logging.js';
 
 interface AppDependencies {
   usageEventsRepository: UsageEventsRepository;
@@ -47,6 +49,25 @@ export const createApp = (dependencies?: Partial<AppDependencies>) => {
     return _drizzleApiRepo;
   }
 
+  app.use(requestLogger);
+  const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? 'http://localhost:5173')
+    .split(',')
+    .map((o) => o.trim());
+
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    }),
+  );
   app.use(express.json());
 
   app.get('/api/health', (_req, res) => {
