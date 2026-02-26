@@ -102,7 +102,7 @@ describe('GET /api/billing/transactions', () => {
       .query({ from: '2024-01-01', to: '2024-01-31', type: 'charge' });
 
     assert.strictEqual(response.status, 200);
-    assert.ok(response.body.data.every((tx: any) => tx.type === 'charge'));
+    assert.ok(response.body.data.every((tx: { type: string }) => tx.type === 'charge'));
   });
 
   it('should respect limit and offset parameters', async () => {
