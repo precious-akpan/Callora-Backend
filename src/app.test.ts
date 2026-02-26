@@ -309,6 +309,8 @@ test('GET /api/developers/apis lists APIs with stats, filters, and pagination', 
   assert.deepEqual(filtered.body.data, [
     { id: 103, name: 'Archived API', status: 'archived', callCount: 0 },
   ]);
+});
+
 // ── GET /api/apis/:id ────────────────────────────────────────────────────────
 
 const buildApiRepo = () => {
