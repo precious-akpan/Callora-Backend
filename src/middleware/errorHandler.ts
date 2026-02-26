@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { isAppError } from '../errors/index.js';
 import { logger } from '../logger.js';
 
@@ -23,7 +23,9 @@ export interface ErrorResponseBody {
 export function errorHandler(
   err: unknown,
   _req: Request,
-  res: Response<ErrorResponseBody>
+  res: Response<ErrorResponseBody>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: NextFunction
 ): void {
   const statusCode = isAppError(err) ? err.statusCode : 500;
   const message = err instanceof Error ? err.message : 'Internal server error';
