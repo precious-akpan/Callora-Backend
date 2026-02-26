@@ -1,5 +1,5 @@
 import {
-  Server,
+  Horizon,
   Networks,
   TransactionBuilder,
   Operation,
@@ -62,7 +62,7 @@ export class TransactionBuilderService {
     // Step 1: Initialize Stellar SDK with network
     const { networkPassphrase, horizonUrl } = this.getNetworkConfig(params.network);
 
-    const server = new Server(horizonUrl);
+    const server = new Horizon.Server(horizonUrl);
 
     // Step 2: Load source account from network
     const sourceKey = params.sourceAccount ?? params.userPublicKey;
