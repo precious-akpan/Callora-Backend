@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { fileURLToPath } from 'node:url';
 import { createApp } from './app.js';
 import { metricsMiddleware, metricsEndpoint } from './metrics.js';
